@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System - Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <div class="sidebar-heading text-center py-4">
+            <i class="fa-solid fa-hotel me-2"></i><strong>Grand Stay</strong>
+            <div class="small text-white-50 mt-1">Management Portal</div>
+        </div>
+        <div class="list-group list-group-flush my-2">
+            <a href="#" class="list-group-item list-group-item-action active" onclick="showTab('dashboardTab', this)">
+                <i class="fa-solid fa-chart-line me-2"></i> Dashboard
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showTab('roomsTab', this)">
+                <i class="fa-solid fa-door-open me-2"></i> Rooms
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showTab('customersTab', this)">
+                <i class="fa-solid fa-users me-2"></i> Customers
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showTab('bookingsTab', this)">
+                <i class="fa-solid fa-calendar-check me-2"></i> Bookings
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showTab('paymentsTab', this)">
+                <i class="fa-solid fa-file-invoice-dollar me-2"></i> Invoices & Payments
+            </a>
+            <a href="#" id="navStaffTab" class="list-group-item list-group-item-action admin-only" onclick="showTab('staffTab', this)">
+                <i class="fa-solid fa-user-tie me-2"></i> Staff Management
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showTab('reportsTab', this)">
+                <i class="fa-solid fa-chart-pie me-2"></i> Reports & Analytics
+            </a>
+        </div>
+        
+        <div class="px-3 mt-auto mb-4">
+            <div class="card bg-dark text-white border-0 p-2 text-center" style="background: rgba(0,0,0,0.2) !important;">
+                <div class="small fw-bold" id="currentUserDisplay"><i class="fa-solid fa-user-circle me-1"></i> User</div>
+                <span class="badge bg-info text-dark mt-1 mx-auto" id="currentUserRole">Staff</span>
+            </div>
+        </div>
+    </div>
+    <!-- /Sidebar -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper" class="w-100 bg-light">
+
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4 py-3">
+            <div class="d-flex align-items-center w-100 justify-content-between">
+                <h4 class="mb-0 fw-bold text-secondary" id="pageTitle">Dashboard Overview</h4>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="openNewBookingModal()">
+                        <i class="fa-solid fa-plus me-1"></i> New Booking
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="container-fluid p-4">
+
+            <!-- Global Toast Alert -->
+            <div id="globalAlert" class="alert alert-dismissible fade show d-none" role="alert">
+                <span id="globalAlertText"></span>
+                <button type="button" class="btn-close" onclick="hideAlert()"></button>
+            </div>
+
+            <!-- TAB 1: DASHBOARD OVERVIEW -->
+            <div id="dashboardTab" class="tab-content-item">
+                <!-- KPI Cards Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card kpi-card p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="kpi-icon bg-light-blue me-3"><i class="fa-solid fa-bed"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">TOTAL ROOMS</div>
+                                    <h3 class="fw-bold mb-0" id="kpiTotalRooms">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card kpi-card p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="kpi-icon bg-light-green me-3"><i class="fa-solid fa-door-open"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">AVAILABLE ROOMS</div>
+                                    <h3 class="fw-bold mb-0 text-success" id="kpiAvailableRooms">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card kpi-card p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="kpi-icon bg-light-purple me-3"><i class="fa-solid fa-user-check"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">OCCUPIED ROOMS</div>
+                                    <h3 class="fw-bold mb-0 text-danger" id="kpiOccupiedRooms">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card kpi-card p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="kpi-icon bg-light-orange me-3"><i class="fa-solid fa-dollar-sign"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">TOTAL REVENUE</div>
+                                    <h3 class="fw-bold mb-0 text-primary" id="kpiTotalRevenue">$0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Grid Status & Recent Bookings -->
+                <div class="row g-4">
+                    <!-- Room Status Floor Grid -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-th me-2"></i> Live Room Availability Grid</h6>
+                                <div>
+                                    <span class="badge bg-success me-1">Available</span>
+                                    <span class="badge bg-danger me-1">Occupied</span>
+                                    <span class="badge bg-warning text-dark">Maintenance</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" id="roomGridContainer">
+                                    <!-- Dynamic Room Grid Items -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Bookings Widget -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i> Recent Bookings</h6>
+                                <button class="btn btn-sm btn-link text-decoration-none" onclick="showTab('bookingsTab', document.querySelectorAll('.list-group-item')[3])">View All</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Room</th>
+                                                <th>Check-in</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentBookingsTbody">
+                                            <!-- Dynamic Recent Bookings -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ROOM MANAGEMENT -->
+            <div id="roomsTab" class="tab-content-item d-none">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-bed me-2"></i> Room Directory</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openAddRoomModal()">
+                            <i class="fa-solid fa-plus me-1"></i> Add New Room
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <input type="text" id="roomSearchInput" class="form-control" placeholder="Search Room Number..." onkeyup="filterRoomsTable()">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="roomStatusFilter" class="form-select" onchange="filterRoomsTable()">
+                                    <option value="">All Statuses</option>
+                                    <option value="available">Available</option>
+                                    <option value="occupied">Occupied</option>
+                                    <option value="maintenance">Maintenance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Room #</th>
+                                        <th>Type</th>
+                                        <th>Price / Night</th>
+                                        <th>Capacity</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="roomsTbody">
+                                    <!-- Dynamic Rooms Table -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: CUSTOMER MANAGEMENT -->
+            <div id="customersTab" class="tab-content-item d-none">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-address-book me-2"></i> Customer Database</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openAddCustomerModal()">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register New Customer
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input type="text" id="customerSearchInput" class="form-control w-50" placeholder="Search by name, phone or email..." onkeyup="filterCustomersTable()">
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>ID Proof Document</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTbody">
+                                    <!-- Dynamic Customers Table -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: BOOKING MANAGEMENT -->
+            <div id="bookingsTab" class="tab-content-item d-none">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-alt me-2"></i> Reservations & Bookings</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openNewBookingModal()">
+                            <i class="fa-solid fa-plus me-1"></i> Create Booking
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Customer</th>
+                                        <th>Room</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Total Price</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTbody">
+                                    <!-- Dynamic Bookings Table -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: INVOICES & PAYMENTS -->
+            <div id="paymentsTab" class="tab-content-item d-none">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2"></i> Billing & Invoices</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Customer</th>
+                                        <th>Room #</th>
+                                        <th>Dates</th>
+                                        <th>Total Amount</th>
+                                        <th>Payment Method</th>
+                                        <th>Payment Status</th>
+                                        <th class="text-end">Invoice Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoicesTbody">
+                                    <!-- Dynamic Invoices Table -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: STAFF MANAGEMENT (Admin Only) -->
+            <div id="staffTab" class="tab-content-item d-none">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-tie me-2"></i> Staff Directory</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openAddStaffModal()">
+                            <i class="fa-solid fa-plus me-1"></i> Add Staff Member
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Role / Position</th>
+                                        <th>Contact Phone</th>
+                                        <th>Email</th>
+                                        <th>Salary</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTbody">
+                                    <!-- Dynamic Staff Table -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: REPORTS & ANALYTICS -->
+            <div id="reportsTab" class="tab-content-item d-none">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-chart-column me-2"></i> Monthly Revenue Summary</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Month</th>
+                                                <th>Total Collected Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="revenueReportTbody">
+                                            <!-- Dynamic Revenue Data -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-award me-2"></i> Top Spending Customers</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Bookings</th>
+                                                <th>Total Spent</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="topCustomersReportTbody">
+                                            <!-- Dynamic Top Customers -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- /Page Content -->
+
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: ADD / EDIT ROOM -->
+<!-- ============================================================== -->
+<div class="modal fade" id="roomModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="roomModalTitle">Add New Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="roomForm">
+                <div class="modal-body">
+                    <input type="hidden" id="roomFormId">
+                    <div class="mb-3">
+                        <label class="form-label">Room Number</label>
+                        <input type="text" id="roomNumberInput" class="form-control" placeholder="e.g. 104" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Room Type</label>
+                        <select id="roomTypeInput" class="form-select" required>
+                            <option value="Single Standard">Single Standard</option>
+                            <option value="Double Deluxe">Double Deluxe</option>
+                            <option value="Executive Suite">Executive Suite</option>
+                            <option value="Presidential Suite">Presidential Suite</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Price per Night ($)</label>
+                            <input type="number" step="0.01" id="roomPriceInput" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Capacity (Guests)</label>
+                            <input type="number" id="roomCapacityInput" class="form-control" value="2" min="1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select id="roomStatusInput" class="form-select">
+                            <option value="available">Available</option>
+                            <option value="occupied">Occupied</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Save Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: ADD / EDIT CUSTOMER -->
+<!-- ============================================================== -->
+<div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="customerModalTitle">Register Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="customerForm">
+                <div class="modal-body">
+                    <input type="hidden" id="customerFormId">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="custNameInput" class="form-control" placeholder="e.g. John Doe" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone Contact</label>
+                        <input type="text" id="custPhoneInput" class="form-control" placeholder="e.g. +1 555-0199" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="custEmailInput" class="form-control" placeholder="john@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ID Proof Details</label>
+                        <input type="text" id="custIdProofInput" class="form-control" placeholder="e.g. Passport / Driving License #" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: CREATE BOOKING -->
+<!-- ============================================================== -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">New Booking Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="bookingForm">
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Check-in Date</label>
+                            <input type="date" id="bookCheckIn" class="form-control" onchange="loadAvailableRooms()" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Check-out Date</label>
+                            <input type="date" id="bookCheckOut" class="form-control" onchange="loadAvailableRooms()" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Customer</label>
+                        <select id="bookCustomerSelect" class="form-select" required>
+                            <!-- Dynamic customers options -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Available Room</label>
+                        <select id="bookRoomSelect" class="form-select" onchange="calculateBookingCost()" required>
+                            <!-- Dynamic available rooms options -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Payment Method</label>
+                        <select id="bookPaymentMethod" class="form-select">
+                            <option value="Cash">Cash</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="UPI / Online">UPI / Online Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-light rounded border">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Estimated Cost Summary:</span>
+                            <h4 class="text-primary fw-bold mb-0" id="bookEstimatedCost">$0.00</h4>
+                        </div>
+                        <small class="text-muted" id="bookNightsCount">0 Nights</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success fw-bold">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: CHECK-OUT & BILLING FINALIZATION -->
+<!-- ============================================================== -->
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold">Check-out & Final Invoice</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="checkoutForm">
+                <div class="modal-body">
+                    <input type="hidden" id="checkoutBookingId">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Room Base Charge</label>
+                        <input type="text" id="checkoutRoomCost" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Additional Services (Food, Laundry, Minibar)</label>
+                        <input type="number" step="0.01" id="checkoutExtraCost" class="form-control" value="0.00" oninput="updateCheckoutGrandTotal()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Payment Method</label>
+                        <select id="checkoutPaymentMethod" class="form-select">
+                            <option value="Cash">Cash</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="UPI / Online">UPI / Online Transfer</option>
+                        </select>
+                    </div>
+                    <div class="p-3 bg-success bg-opacity-10 border border-success rounded text-center">
+                        <div class="small text-muted fw-bold">GRAND TOTAL BILL</div>
+                        <h3 class="fw-bold text-success mb-0" id="checkoutGrandTotal">$0.00</h3>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success fw-bold">Process Check-out & Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: VIEW & PRINT INVOICE -->
+<!-- ============================================================== -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Official Invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="printableInvoice">
+                <div class="d-flex justify-content-between align-items-center invoice-header mb-4">
+                    <div>
+                        <h3 class="fw-bold text-primary mb-1"><i class="fa-solid fa-hotel me-2"></i> Grand Stay Hotel</h3>
+                        <p class="text-muted mb-0 small">123 Hospitality Blvd, Luxury City<br>Phone: +1 (800) 555-HOTEL | Email: info@grandstay.com</p>
+                    </div>
+                    <div class="text-end">
+                        <h4 class="fw-bold text-uppercase text-secondary">INVOICE</h4>
+                        <span class="badge bg-success" id="invStatusBadge">PAID</span>
+                        <div class="small text-muted mt-1" id="invNumber">INV-001</div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <h6 class="fw-bold text-secondary">BILL TO:</h6>
+                        <h5 class="fw-bold mb-1" id="invCustomerName">Customer Name</h5>
+                        <div class="text-muted small" id="invCustomerDetails">
+                            Phone: +1 555 0192<br>
+                            Email: customer@example.com<br>
+                            ID Proof: Passport A12345
+                        </div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <h6 class="fw-bold text-secondary">BOOKING DETAILS:</h6>
+                        <div class="text-muted small">
+                            <strong>Room #:</strong> <span id="invRoomNum">101</span> (<span id="invRoomType">Deluxe</span>)<br>
+                            <strong>Check-in:</strong> <span id="invCheckIn">2026-10-01</span><br>
+                            <strong>Check-out:</strong> <span id="invCheckOut">2026-10-04</span><br>
+                            <strong>Total Nights:</strong> <span id="invNights">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-center">Rate / Nights</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Room Charges (<span id="invRoomTypeDetail">Deluxe</span>)</td>
+                            <td class="text-center"><span id="invNightlyRate">$0</span> x <span id="invNightsDetail">0</span> Nights</td>
+                            <td class="text-end" id="invRoomTotal">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Additional Services & Amenities</td>
+                            <td class="text-center">-</td>
+                            <td class="text-end" id="invExtraServices">$0.00</td>
+                        </tr>
+                        <tr class="table-light fw-bold">
+                            <td colspan="2" class="text-end">Grand Total Amount:</td>
+                            <td class="text-end text-primary h5 fw-bold mb-0" id="invGrandTotal">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center text-muted small pt-3 border-top">
+                    <div>Payment Method: <strong id="invPaymentMethod">Cash</strong></div>
+                    <div>Thank you for staying with us!</div>
+                </div>
+            </div>
+            <div class="modal-footer no-print">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fa-solid fa-print me-1"></i> Print Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- MODAL: ADD / EDIT STAFF -->
+<!-- ============================================================== -->
+<div class="modal fade" id="staffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="staffModalTitle">Add Staff Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="staffForm">
+                <div class="modal-body">
+                    <input type="hidden" id="staffFormId">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="staffNameInput" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role / Position</label>
+                        <input type="text" id="staffRoleInput" class="form-control" placeholder="e.g. Receptionist, Manager, Housekeeping" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Phone</label>
+                        <input type="text" id="staffContactInput" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="staffEmailInput" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Monthly Salary ($)</label>
+                        <input type="number" step="0.01" id="staffSalaryInput" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Save Staff</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap 5 Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Main Application Logic -->
+<script src="js/main.js"></script>
+</body>
+</html>
