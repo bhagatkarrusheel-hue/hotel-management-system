@@ -1,0 +1,161 @@
+/* Custom Styling for Hotel Management System */
+:root {
+    --primary-color: #2b5876;
+    --primary-gradient: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
+    --accent-color: #00b4db;
+    --bg-light: #f8f9fa;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* Sidebar Styling */
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 260px;
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 1.5rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-wrapper .list-group-item {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border: none;
+    padding: 0.9rem 1.4rem;
+    font-weight: 500;
+    border-left: 4px solid transparent;
+    transition: all 0.25s ease;
+}
+
+#sidebar-wrapper .list-group-item:hover,
+#sidebar-wrapper .list-group-item.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-left-color: #00d2ff;
+}
+
+#sidebar-wrapper .list-group-item i {
+    width: 24px;
+}
+
+/* Metric KPI Cards */
+.kpi-card {
+    border: none;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--hover-shadow);
+}
+
+.kpi-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.bg-light-blue { background: rgba(0, 180, 219, 0.12); color: #00b4db; }
+.bg-light-green { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+.bg-light-orange { background: rgba(255, 193, 7, 0.15); color: #d39e00; }
+.bg-light-purple { background: rgba(111, 66, 193, 0.12); color: #6f42c1; }
+
+/* Room Grid Visual Display */
+.room-card {
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.room-card.available {
+    background-color: #e6f4ea;
+    border-color: #34a853;
+}
+
+.room-card.occupied {
+    background-color: #fce8e6;
+    border-color: #ea4335;
+}
+
+.room-card.maintenance {
+    background-color: #fef7e0;
+    border-color: #fbbc04;
+}
+
+/* Status Badges */
+.badge-available { background-color: #28a745; }
+.badge-occupied { background-color: #dc3545; }
+.badge-maintenance { background-color: #ffc107; color: #212529; }
+.badge-confirmed { background-color: #17a2b8; }
+.badge-checked_in { background-color: #28a745; }
+.badge-checked_out { background-color: #6c757d; }
+.badge-cancelled { background-color: #dc3545; }
+
+/* Printable Invoice Modal Styling */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printableInvoice, #printableInvoice * {
+        visibility: visible;
+    }
+    #printableInvoice {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+.invoice-header {
+    border-bottom: 2px solid #2b5876;
+    padding-bottom: 1rem;
+}
+
+/* Login Page Styling */
+.login-body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    border: none;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.login-card-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
